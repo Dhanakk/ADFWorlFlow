@@ -1,0 +1,17 @@
+{
+	"name": "ds_azure_sqldb_withoutparameters",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_Azure_SqlDB",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "apidb"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

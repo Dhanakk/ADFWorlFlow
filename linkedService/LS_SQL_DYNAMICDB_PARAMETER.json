@@ -1,0 +1,17 @@
+{
+	"name": "LS_SQL_DYNAMICDB_PARAMETER",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"parameters": {
+			"tblname": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "AzureSqlDatabase",
+		"typeProperties": {
+			"connectionString": "integrated security=False;encrypt=True;connection timeout=30;data source=demo-dr-sql.database.windows.net;initial catalog=demo-emp;user id=dhana",
+			"encryptedCredential": "ew0KICAiVmVyc2lvbiI6ICIyMDE3LTExLTMwIiwNCiAgIlByb3RlY3Rpb25Nb2RlIjogIktleSIsDQogICJTZWNyZXRDb250ZW50VHlwZSI6ICJQbGFpbnRleHQiLA0KICAiQ3JlZGVudGlhbElkIjogIkRBVEFGQUNUT1JZQDY3N0UzNDdCLTFDREQtNENBNy1CMDkyLTkxQURCQkEyRkM5OF84Y2QwNTkyOC1hYWU3LTQ2N2MtOWQ1ZS1lNTU2MWExYjFjMTMiDQp9"
+		}
+	}
+}

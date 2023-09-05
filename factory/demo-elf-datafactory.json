@@ -1,0 +1,9 @@
+{
+	"name": "demo-elf-datafactory",
+	"location": "eastus",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "ed7ead20-3985-446c-98ff-1576c675770d",
+		"tenantId": "235bd3b6-7f60-4f61-b899-384f04456537"
+	}
+}

@@ -1,0 +1,199 @@
+{
+	"name": "untilactivity",
+	"properties": {
+		"activities": [
+			{
+				"name": "Script1",
+				"type": "Script",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"linkedServiceName": {
+					"referenceName": "LS_SQL_DYNAMICDB_PARAMETER",
+					"type": "LinkedServiceReference",
+					"parameters": {
+						"tblname": "emp"
+					}
+				},
+				"typeProperties": {
+					"scripts": [
+						{
+							"parameters": [
+								{
+									"name": "employeecount",
+									"type": "Int32",
+									"value": "0",
+									"direction": "Output"
+								}
+							],
+							"type": "Query",
+							"text": "select ecount=count(*) from dbo.emp\n\nselect * from dbo.emp"
+						}
+					],
+					"scriptBlockExecutionTimeout": "02:00:00"
+				}
+			},
+			{
+				"name": "Set variable1",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Script1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "paramecount",
+					"value": {
+						"value": "@{activity('Script1').output.resultSets[0].rows[0].ecount}",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Until1",
+				"type": "Until",
+				"dependsOn": [
+					{
+						"activity": "Set variable1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"expression": {
+						"value": "@greater(int(variables('initValue')),13)",
+						"type": "Expression"
+					},
+					"activities": [
+						{
+							"name": "Append variable1",
+							"type": "AppendVariable",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "empArrayList",
+								"value": {
+									"value": "@activity('Script1').output.resultSets[1].rows[int(variables('initValue'))].ename",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "Set variable2",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "Append variable1",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "tempValue",
+								"value": {
+									"value": "@{add(int(variables('initValue')),1)}",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "Set variable3",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "Set variable2",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "initValue",
+								"value": {
+									"value": "@{variables('tempValue')}",
+									"type": "Expression"
+								}
+							}
+						}
+					],
+					"timeout": "0.12:00:00"
+				}
+			},
+			{
+				"name": "Set variable4",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Until1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "finalvalue",
+					"value": {
+						"value": "@{variables('empArrayList')}",
+						"type": "Expression"
+					}
+				}
+			}
+		],
+		"variables": {
+			"paramecount": {
+				"type": "String"
+			},
+			"initValue": {
+				"type": "String",
+				"defaultValue": "0"
+			},
+			"empArrayList": {
+				"type": "Array"
+			},
+			"tempValue": {
+				"type": "String"
+			},
+			"finalvalue": {
+				"type": "String"
+			}
+		},
+		"folder": {
+			"name": "untilActivity"
+		},
+		"annotations": [],
+		"lastPublishTime": "2023-08-17T14:19:00Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

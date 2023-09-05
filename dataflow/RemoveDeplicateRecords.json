@@ -1,0 +1,73 @@
+{
+	"name": "RemoveDeplicateRecords",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_blobempfile",
+						"type": "DatasetReference"
+					},
+					"name": "inputempdata"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_outputdataflow",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "window1"
+				},
+				{
+					"name": "filter1"
+				},
+				{
+					"name": "select1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          empid as short,",
+				"          ename as string,",
+				"          dept as short,",
+				"          salary as short",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> inputempdata",
+				"inputempdata window(over(ename,",
+				"          empid,",
+				"          dept,",
+				"          salary),",
+				"     asc(empid, true),",
+				"     asc(ename, true),",
+				"     asc(dept, true),",
+				"     asc(salary, true),",
+				"     CTERowNumber = rowNumber()) ~> window1",
+				"window1 filter(CTERowNumber == 1) ~> filter1",
+				"filter1 select(mapColumn(",
+				"          empid,",
+				"          ename,",
+				"          dept,",
+				"          salary",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"select1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     partitionFileNames:['duplicateRecordsRemoval'],",
+				"     dateFormat:'MM/dd/yyyy',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> sink1"
+			]
+		}
+	}
+}

@@ -1,0 +1,61 @@
+{
+	"name": "copywebapitoblobstorage",
+	"properties": {
+		"activities": [
+			{
+				"name": "ReadWebactivity",
+				"type": "WebActivity",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"url": "https://dummy.restapiexample.com/api/v1/employees",
+					"method": "GET"
+				}
+			},
+			{
+				"name": "Web1",
+				"type": "WebActivity",
+				"dependsOn": [
+					{
+						"activity": "ReadWebactivity",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"url": "https://demodrblobstorage.blob.core.windows.net/webactivityoutput/webactivityoutput.json?sp=racw&st=2023-08-20T18:17:58Z&se=2023-08-31T02:17:58Z&spr=https&sv=2022-11-02&sr=c&sig=da48VgdLjcIYfwJsSRrVCUEh8mjpwMObLh8zE1D74ZA%3D",
+					"method": "PUT",
+					"headers": {
+						"x-ms-blob-type": "BlockBlob"
+					},
+					"body": {
+						"value": "@activity('ReadWebactivity').output",
+						"type": "Expression"
+					}
+				}
+			}
+		],
+		"folder": {
+			"name": "WebActivity"
+		},
+		"annotations": [],
+		"lastPublishTime": "2023-08-20T18:44:50Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

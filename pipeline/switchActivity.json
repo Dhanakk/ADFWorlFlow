@@ -1,0 +1,107 @@
+{
+	"name": "switchActivity",
+	"properties": {
+		"activities": [
+			{
+				"name": "Lookup1",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": "Declare @finalbill varchar(100)='0'\nexec CalculateCurrentBill 900, @finalbill output\nselect @finalbill as finalbill",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "ds_azure_sqldb_withoutparameters",
+						"type": "DatasetReference"
+					}
+				}
+			},
+			{
+				"name": "Switch1",
+				"type": "Switch",
+				"dependsOn": [
+					{
+						"activity": "Lookup1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"on": {
+						"value": "@activity('Lookup1').output.firstRow.data1",
+						"type": "Expression"
+					},
+					"cases": [
+						{
+							"value": "data1",
+							"activities": [
+								{
+									"name": "data1 wait",
+									"type": "Wait",
+									"dependsOn": [],
+									"userProperties": [],
+									"typeProperties": {
+										"waitTimeInSeconds": 1
+									}
+								}
+							]
+						}
+					],
+					"defaultActivities": [
+						{
+							"name": "default",
+							"type": "Wait",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"waitTimeInSeconds": 1
+							}
+						}
+					]
+				}
+			}
+		],
+		"parameters": {
+			"ReadingUnits": {
+				"type": "string",
+				"defaultValue": "50"
+			}
+		},
+		"variables": {
+			"unitperprice1": {
+				"type": "String",
+				"defaultValue": "1"
+			},
+			"unitperprice2": {
+				"type": "String",
+				"defaultValue": "2"
+			},
+			"unitperprice3": {
+				"type": "String",
+				"defaultValue": "3.5"
+			},
+			"pricevalue": {
+				"type": "Integer"
+			},
+			"Readingunits": {
+				"type": "Integer"
+			}
+		},
+		"annotations": [],
+		"lastPublishTime": "2023-08-21T10:07:04Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}
